@@ -6,26 +6,28 @@
 /*   By: cipelat <cipelat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/20 03:38:32 by cipelat           #+#    #+#             */
-/*   Updated: 2025/11/23 20:22:27 by cipelat          ###   ########.fr       */
+/*   Updated: 2025/11/24 01:22:09 by cipelat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Fixed.hpp"
 
+
+/* ************************************************************************** */
+/*                          CONSTRUCTORS / DESTRUCTORS                        */
+/* ************************************************************************** */
+
 Fixed::Fixed() : _nb(0) 
 {
-	std::cout << "Default constructor called" << std::endl;
 }
 
 Fixed::Fixed(const int nb)
 {
-	std::cout << "Int constructor called" << std::endl;
     _nb = nb << _bits; 
 }
 
 Fixed::Fixed(const float nb)
 {
-	std::cout << "Float constructor called" << std::endl;
 	if (nb >= 0)
     	_nb = (int)(nb * (1 << _bits) + 0.5f);
 	else
@@ -34,17 +36,94 @@ Fixed::Fixed(const float nb)
 
 Fixed::Fixed(const Fixed& other)
 {
-	std::cout << "Copy constructor called" << std::endl;
 	this->_nb = other._nb;
 }
 
+Fixed::~Fixed()
+{
+}
+
+
+/* ************************************************************************** */
+/*                           GETTERS / SETTERS                                */
+/* ************************************************************************** */
+
+int  Fixed::getRawBits(void) const
+{
+	return (_nb);
+}
+
+void Fixed::setRawBits(int const raw)
+{
+	_nb = raw;
+}
+
+
+/* ************************************************************************** */
+/*                             CONVERSIONS                                    */
+/* ************************************************************************** */
+
+float Fixed::toFloat(void) const
+{
+	return ((float)_nb / (1 << _bits));
+}
+
+int Fixed::toInt(void) const
+{
+	return (_nb >> _bits);
+}
+
+
+/* ************************************************************************** */
+/*                        COMPARISON OPERATORS                                */
+/* ************************************************************************** */
+
+bool Fixed::operator!=(const Fixed &other) const
+{
+	return(this->_nb != other._nb);
+}
+
+bool Fixed::operator==(const Fixed &other) const
+{
+	return(this->_nb == other._nb);
+}
+
+bool Fixed::operator<=(const Fixed &other) const
+{
+	return (this->_nb <= other._nb);
+}
+
+bool Fixed::operator>=(const Fixed &other) const
+{
+	return (this->_nb >= other._nb);
+}
+
+bool Fixed::operator<(const Fixed &other) const
+{
+	return (this->_nb < other._nb);
+}
+
+bool Fixed::operator>(const Fixed &other) const
+{
+	return (this->_nb > other._nb);
+}
+
+
+/* ************************************************************************** */
+/*                       ASSIGNMENT OPERATOR                                  */
+/* ************************************************************************** */
+
 Fixed& Fixed::operator=(const Fixed &other)
 {
-	std::cout << "Copy assignment operator called" << std::endl;
 	if (this != &other)
 		this->_nb = other._nb;
 	return(*this);
 }
+
+
+/* ************************************************************************** */
+/*                     INCREMENT / DECREMENT OPERATORS                        */
+/* ************************************************************************** */
 
 Fixed Fixed::operator++(int)
 {
@@ -74,127 +153,64 @@ Fixed& Fixed::operator--()
 	return(*this);
 }
 
-Fixed& Fixed::operator++(void)
-{
-	std::cout << "Copy assignment operator called" << std::endl;
-	if (this != &other)
-		this->_nb = other._nb;
-	return(*this);
-}
+
+/* ************************************************************************** */
+/*                     INCREMENT / DECREMENT OPERATORS                        */
+/* ************************************************************************** */
 
 Fixed Fixed::operator+(const Fixed &other) const
 {
-	Fixed res;
-	
-	res._nb = this->_nb + other._nb;
-	return(res);
+	return (this->toFloat() + other.toFloat());
 }
 
 Fixed Fixed::operator-(const Fixed &other) const
 {
-	Fixed res;
-	
-	res._nb = this->_nb - other._nb;
-	return(res);
+	return (this->toFloat() - other.toFloat());
 }
 
 Fixed Fixed::operator*(const Fixed &other) const
-{
-	Fixed res;
-	
-	res._nb = this->_nb * other._nb;
-	return(res);
-}
-
-bool Fixed::operator!=(const Fixed &other)
-{
-	if (this->_nb != other._nb)
-		return (true);
-	else
-		return(false);
+{	
+	return (this->toFloat() * other.toFloat());
 }
 
 Fixed Fixed::operator/(const Fixed &other) const
 {
-	Fixed res;
-	
-	res._nb = this->_nb / other._nb;
-	return(res);
+	return (this->toFloat() / other.toFloat());
 }
 
-bool Fixed::operator<=(const Fixed &other)
+
+/* ************************************************************************** */
+/*                          STATIC MIN / MAX                                  */
+/* ************************************************************************** */
+
+const Fixed&	Fixed::min(const Fixed &first, const Fixed &second)
 {
-	if (operator==(other))
-		return (true);
-	else if (this->_nb <= other._nb)
-		return (true);
-	else
-		return (false);
+	return (first < second ? first : second);
 }
 
-bool Fixed::operator>=(const Fixed &other)
+Fixed&	Fixed::min(Fixed &first, Fixed &second)
 {
-	if (operator==(other))
-		return (true);
-	else if (this->_nb >= other._nb)
-		return (true);
-	else
-		return (false);
+	return (first < second ? first : second);
 }
 
-bool Fixed::operator>(const Fixed &other)
+const Fixed&	Fixed::max(const Fixed &first, const Fixed &second)
 {
-	if (this->_nb > other._nb)
-		return (true);
-	else
-		return (false);
+	return (first > second ? first : second);
 }
 
-bool Fixed::operator<(const Fixed &other)
+Fixed&	Fixed::max(Fixed &first, Fixed &second)
 {
-	if (this->_nb < other._nb)
-		return (true);
-	else
-		return (false);
+	return (first > second ? first : second);
 }
 
-bool Fixed::operator==(const Fixed &other)
-{
-	if (operator!=(other))
-		return (false);
-	else
-		return(true);
-}
 
-int  Fixed::getRawBits(void) const
-{
-	std::cout << "getRawBits member function called" << std::endl;
-	return (_nb);
-}
-
-void Fixed::setRawBits(int const raw)
-{
-	_nb = raw;
-}
-
-float Fixed::toFloat(void) const
-{
-	return ((float)_nb / (1 << _bits));
-}
-
-int Fixed::toInt(void) const
-{
-	return (_nb >> _bits);
-}
+/* ************************************************************************** */
+/*                       STREAM INSERTION / OUTPUT                            */
+/* ************************************************************************** */
 
 std::ostream& operator<<(std::ostream &out, const Fixed &fixed)
 {
 	const float nb = fixed.toFloat();
 	out << nb;
 	return(out);
-}
-
-Fixed::~Fixed()
-{
-	std::cout << "Destructor called" << std::endl;
 }
